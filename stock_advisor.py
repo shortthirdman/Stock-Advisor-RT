@@ -38,6 +38,9 @@ def process_stock_update():
     if not data.empty and not dow_data.empty:
         # Simulate receiving a new data point for AAPL and Dow Jones
         update = data.iloc[0].to_frame().T
+        time_str = update.index[0].time()
+        logtxtbox.caption(time_str)
+
         dow_update = dow_data.iloc[0].to_frame().T
         data = data.iloc[1:]  # Remove the processed row
         dow_data = dow_data.iloc[1:]
