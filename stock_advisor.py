@@ -145,19 +145,60 @@ def calculate_insights(window, dow_window):
         
         st.divider()
 
-        # Print the calculated insights
-        st.write(f"5-minute Rolling Average: {rolling_avg:.2f}")
-        st.write(f"EMA: {ema:.2f}")
-        st.write(f"RSI: {rsi:.2f}")
-        st.write(f"Bollinger Upper Band: {bollinger_upper:.2f}, Lower Band: {bollinger_lower:.2f}")
-        st.write(f"Price Change: {price_change:.2f}")
-        st.write(f"Volume Change: {volume_change}")
-        st.write(f"DOW Price Change: {dow_price_change:.2f}")
-        st.write(f"DOW Volume Change: {dow_volume_change}")
-        st.write(f"Dow Jones 5-minute Rolling Average: {dow_rolling_avg:.2f}")
-        st.write(f"Daily High: {daily_high:.2f}, Daily Low: {daily_low:.2f}")
-        st.write(f"Buying Momentum: {buying_momentum:.2f}, Selling Momentum: {selling_momentum:.2f}")
-        st.write(f"Market has been open for {market_open_duration:.2f} minutes")
+        # # Print the calculated insights
+        # st.write(f"5-minute Rolling Average: {rolling_avg:.2f}")
+        # st.write(f"EMA: {ema:.2f}")
+        # st.write(f"RSI: {rsi:.2f}")
+        # st.write(f"Bollinger Upper Band: {bollinger_upper:.2f}, Lower Band: {bollinger_lower:.2f}")
+        # st.write(f"Price Change: {price_change:.2f}")
+        # st.write(f"Volume Change: {volume_change}")
+        # st.write(f"DOW Price Change: {dow_price_change:.2f}")
+        # st.write(f"DOW Volume Change: {dow_volume_change}")
+        # st.write(f"Dow Jones 5-minute Rolling Average: {dow_rolling_avg:.2f}")
+        # st.write(f"Daily High: {daily_high:.2f}, Daily Low: {daily_low:.2f}")
+        # st.write(f"Buying Momentum: {buying_momentum:.2f}, Selling Momentum: {selling_momentum:.2f}")
+        # st.write(f"Market has been open for {market_open_duration:.2f} minutes")
+
+        # Create a DataFrame to display the insights
+        insights_df = pd.DataFrame({
+            "Metric": [
+                "5-minute Rolling Average",
+                "EMA",
+                "RSI",
+                "Bollinger Upper Band",
+                "Bollinger Lower Band",
+                "Price Change",
+                "Volume Change",
+                "DOW Price Change",
+                "DOW Volume Change",
+                "Dow Jones 5-minute Rolling Average",
+                "Daily High",
+                "Daily Low",
+                "Buying Momentum",
+                "Selling Momentum",
+                "Market Open Duration (minutes)"
+            ],
+            "Value": [
+                f"{rolling_avg:.2f}",
+                f"{ema:.2f}",
+                f"{rsi:.2f}",
+                f"{bollinger_upper:.2f}",
+                f"{bollinger_lower:.2f}",
+                f"{price_change:.2f}",
+                f"{volume_change}",
+                f"{dow_price_change:.2f}",
+                f"{dow_volume_change}",
+                f"{dow_rolling_avg:.2f}",
+                f"{daily_high:.2f}",
+                f"{daily_low:.2f}",
+                f"{buying_momentum:.2f}",
+                f"{selling_momentum:.2f}",
+                f"{market_open_duration:.2f}"
+            ]
+        })
+
+        # Display the insights as a table
+        st.table(insights_df)
         
         if int(market_open_duration) % 5 == 0:  # Trigger LLM every 5 minutes
             get_natural_language_insights(
