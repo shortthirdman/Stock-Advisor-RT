@@ -26,3 +26,9 @@ This project uses LLM-powered insights to fetch stock data every minute, analyze
 	```shell
 	pip install -r requirements.txt --no-cache-dir --disable-pip-version-check
 	```
+
+  - Run the Streamlit app
+  
+    ```shell
+	streamlit run stock_advisor.py
+	```

@@ -7,17 +7,20 @@ import warnings
 import ollama
 from datetime import datetime, timedelta
 
+warnings.filterwarnings("ignore")
+
+st.set_page_config(page_title="Stock Advisor RT",layout="centered")
 st.title("Real-Time AI Stock Advisor with Ollama (Llama 3) & Streamlit")
 
-st.write("Fetch stock data for analysis...done")
+logtxtbox = st.empty()
+logtxt = '09:30:00'
+logtxtbox.caption(logtxt)
 
 # Fetching historical data for Apple (AAPL) and Dow Jones (DJI)
 stock = yf.Ticker("AAPL")
 dow_jones = yf.Ticker("^DJI")
 data = stock.history(period="1d", interval="1m")
 dow_data = dow_jones.history(period="1d", interval="1m")
-
-st.write("Process real-time stock updates...done")
 
 # Global variables to store rolling data
 rolling_window = pd.DataFrame()
@@ -84,13 +87,14 @@ def get_market_open_duration(window):
     
     return market_open_duration
 
-st.write("Analyzing the stock trends")
-st.write("""
-To make sense of the real-time data, we calculate moving averages, price changes, volume changes, and technical indicators like Exponential Moving Average (EMA), Bollinger Bands, and RSI (Relative Strength Index).
+st.subheader("Analyzing the stock trends")
+st.markdown("""
+    To make sense of the real-time data, we calculate moving averages, price changes, volume changes, and technical indicators like
+            **Exponential Moving Average (EMA)**, **Bollinger Bands**, and **RSI (Relative Strength Index)**.
 """)
-st.write("1. Exponential Moving Average (EMA): Puts more weight on recent prices to identify short-term trends.")
-st.write("2. Relative Strength Index (RSI): Measures price movement speed and oscillates between 0 and 100 to identify overbought/oversold conditions.")
-st.write("3. Bollinger Bands: Help assess market volatility with upper and lower bands around the moving average.")
+st.markdown("1. **Exponential Moving Average (EMA):** Puts more weight on recent prices to identify short-term trends.")
+st.markdown("2. **Relative Strength Index (RSI):** Measures price movement speed and oscillates between 0 and 100 to identify overbought/oversold conditions.")
+st.markdown("3. **Bollinger Bands:** Help assess market volatility with upper and lower bands around the moving average.")
 
 def calculate_insights(window, dow_window):
     if len(window) >= 5:
@@ -136,30 +140,30 @@ def calculate_insights(window, dow_window):
         
         market_open_duration = get_market_open_duration(window)
         
+        st.divider()
+
         # Print the calculated insights
-        print(f"5-minute Rolling Average: {rolling_avg:.2f}")
-        print(f"EMA: {ema:.2f}")
-        print(f"RSI: {rsi:.2f}")
-        print(f"Bollinger Upper Band: {bollinger_upper:.2f}, Lower Band: {bollinger_lower:.2f}")
-        print(f"Price Change: {price_change:.2f}")
-        print(f"Volume Change: {volume_change}")
-        print(f"DOW Price Change: {dow_price_change:.2f}")
-        print(f"DOW Volume Change: {dow_volume_change}")
-        print(f"Dow Jones 5-minute Rolling Average: {dow_rolling_avg:.2f}")
-        print(f"Daily High: {daily_high:.2f}, Daily Low: {daily_low:.2f}")
-        print(f"Buying Momentum: {buying_momentum:.2f}, Selling Momentum: {selling_momentum:.2f}")
-        print(f"Market has been open for {market_open_duration:.2f} minutes")
+        st.write(f"5-minute Rolling Average: {rolling_avg:.2f}")
+        st.write(f"EMA: {ema:.2f}")
+        st.write(f"RSI: {rsi:.2f}")
+        st.write(f"Bollinger Upper Band: {bollinger_upper:.2f}, Lower Band: {bollinger_lower:.2f}")
+        st.write(f"Price Change: {price_change:.2f}")
+        st.write(f"Volume Change: {volume_change}")
+        st.write(f"DOW Price Change: {dow_price_change:.2f}")
+        st.write(f"DOW Volume Change: {dow_volume_change}")
+        st.write(f"Dow Jones 5-minute Rolling Average: {dow_rolling_avg:.2f}")
+        st.write(f"Daily High: {daily_high:.2f}, Daily Low: {daily_low:.2f}")
+        st.write(f"Buying Momentum: {buying_momentum:.2f}, Selling Momentum: {selling_momentum:.2f}")
+        st.write(f"Market has been open for {market_open_duration:.2f} minutes")
         
         if int(market_open_duration) % 5 == 0:  # Trigger LLM every 5 minutes
             get_natural_language_insights(
                 rolling_avg, ema, rsi, bollinger_upper, bollinger_lower,
                 price_change, volume_change, dow_rolling_avg, market_open_duration, 
                 dow_price_change, dow_volume_change, daily_high, daily_low, 
-                buying_momentum, selling_momentum
+                buying_momentum, selling_momentum, window.index[-1].time().strftime("%H:%M:%S")
             )
 
-
-st.write("Getting Natural Language Insights Using Ollama")
 
 def get_natural_language_insights(
     rolling_avg, ema, rsi, bollinger_upper, bollinger_lower,
@@ -187,19 +191,21 @@ def get_natural_language_insights(
     message = st.chat_message("assistant")
     message.write(timestamp)
     message.write(response_text)
-    print("Natural Language Insight:", response_text)
+    st.write("Getting Natural Language Insights Using Ollama")
+    st.write("Natural Language Insight:", response_text)
     
 
-st.write("Setting up the Streamlit UI")
+try:
+    # Schedule job to simulate receiving updates every minute
+    schedule.every(10).seconds.do(process_stock_update)
 
-# Schedule job to simulate receiving updates every minute
-schedule.every(10).seconds.do(process_stock_update)  
-
-
-message = st.chat_message("assistant")
-message.write("Starting real-time simulation for AAPL stock updates. First update will be processed in 5 minutes...")    
-# Run the scheduled jobs
-print("Starting real-time simulation for AAPL stock updates...")
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+    message = st.chat_message("assistant")
+    message.write("Starting real-time simulation for AAPL stock updates. First update will be processed in 5 minutes...")    
+    # Run the scheduled jobs
+    print("Starting real-time simulation for AAPL stock updates...")
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+except Exception as ex:
+    e = RuntimeError(ex)
+    st.exception(e)
