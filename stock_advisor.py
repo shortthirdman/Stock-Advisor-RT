@@ -145,20 +145,6 @@ def calculate_insights(window, dow_window):
         
         st.divider()
 
-        # # Print the calculated insights
-        # st.write(f"5-minute Rolling Average: {rolling_avg:.2f}")
-        # st.write(f"EMA: {ema:.2f}")
-        # st.write(f"RSI: {rsi:.2f}")
-        # st.write(f"Bollinger Upper Band: {bollinger_upper:.2f}, Lower Band: {bollinger_lower:.2f}")
-        # st.write(f"Price Change: {price_change:.2f}")
-        # st.write(f"Volume Change: {volume_change}")
-        # st.write(f"DOW Price Change: {dow_price_change:.2f}")
-        # st.write(f"DOW Volume Change: {dow_volume_change}")
-        # st.write(f"Dow Jones 5-minute Rolling Average: {dow_rolling_avg:.2f}")
-        # st.write(f"Daily High: {daily_high:.2f}, Daily Low: {daily_low:.2f}")
-        # st.write(f"Buying Momentum: {buying_momentum:.2f}, Selling Momentum: {selling_momentum:.2f}")
-        # st.write(f"Market has been open for {market_open_duration:.2f} minutes")
-
         # Create a DataFrame to display the insights
         insights_df = pd.DataFrame({
             "Metric": [
